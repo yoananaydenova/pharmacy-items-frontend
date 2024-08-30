@@ -1,13 +1,13 @@
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import './App.css'
-import Items from './pages/Items'
+import Search from './components/Search'
 
 function App() {
 
 
   return (
     <>
-      <Items />
+      <Search />
     </>
   )
 }
