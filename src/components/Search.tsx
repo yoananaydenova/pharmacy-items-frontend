@@ -14,7 +14,7 @@ const Search = () => {
     const [searchData, setSearchData] = useState<FormData>(
         {
             pharms: [],
-            limit: "5",
+            limit: "1",
             text: ""
         }
     )
@@ -40,8 +40,8 @@ const Search = () => {
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        if(name === "limit" && parseInt(value) < 1){
-
+        if (name === "limit" && parseInt(value) <= 1) {
+            return;
         }
         setSearchData({ ...searchData, [name]: value })
     }
@@ -81,31 +81,8 @@ const Search = () => {
                     </div>
                     <div className="d-flex flex-column b align-items-start">
                         <label >Choose limit:</label>
-                        <input onChange={onInputChange} name="limit" className="form-control input-lg mb-3" min="1" type="number" placeholder="Limit results for pharmacy..." aria-label="Limit" />
-                        {/* <div className="d-flex flex-row gap-3 mb-3">
-
-                            <div className="form-check">
-                                <input className="form-check-input" type="radio" name="limit" id="limit5" value="5" checked={searchData.limit == "5"} onChange={onInputChange} />
-                                <label className="form-check-label" htmlFor="limit5">
-                                    5
-                                </label>
-                            </div>
-                            <div className="form-check">
-                                <input className="form-check-input" type="radio" name="limit" id="limit10" value="10" checked={searchData.limit == "10"} onChange={onInputChange} />
-                                <label className="form-check-label" htmlFor="limit10">
-                                    10
-                                </label>
-                            </div>
-                            <div className="form-check">
-                                <input className="form-check-input" type="radio" name="limit" id="limit20" value="20" checked={searchData.limit == "20"} onChange={onInputChange} />
-                                <label className="form-check-label" htmlFor="limit20">
-                                    20
-                                </label>
-                            </div>
-
-                        </div> */}
+                        <input onChange={onInputChange} name="limit" defaultValue="1" className="form-control input-lg mb-3" min="1" type="number" placeholder="Limit results for pharmacy..." aria-label="Limit" />
                     </div>
-
 
                     <button className="btn btn-outline-success" type="submit">Search</button>
                 </div>
