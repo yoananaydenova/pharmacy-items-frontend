@@ -3,7 +3,7 @@ import axios from "axios"
 
 type FormData = {
     pharms: string[];
-    limit: string;
+    limit: number;
     text: string
 }
 
@@ -14,7 +14,7 @@ const Search = () => {
     const [searchData, setSearchData] = useState<FormData>(
         {
             pharms: [],
-            limit: "1",
+            limit: 1,
             text: ""
         }
     )
@@ -39,16 +39,22 @@ const Search = () => {
     }
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        if (name === "limit" && parseInt(value) <= 1) {
-            return;
+
+        let { name, value, min, max } = e.target;
+
+        let newValue: string | number = value;
+        if (name === "limit") {
+            newValue = Math.max(Number(min), Math.min(Number(max), Number(value)));
         }
-        setSearchData({ ...searchData, [name]: value })
+
+        setSearchData({ ...searchData, [name]: newValue })
     }
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
+
         const requestParams = { ...searchData, pharms: searchData.pharms.toString() }
+
         axios.get('http://localhost:8080/items'
             , { params: requestParams }
         ).then(res => setItems(res.data))
@@ -81,7 +87,7 @@ const Search = () => {
                     </div>
                     <div className="d-flex flex-column b align-items-start">
                         <label >Choose limit:</label>
-                        <input onChange={onInputChange} name="limit" defaultValue="1" className="form-control input-lg mb-3" min="1" type="number" placeholder="Limit results for pharmacy..." aria-label="Limit" />
+                        <input onChange={onInputChange} name="limit" defaultValue="1" className="form-control input-lg mb-3" min="1" max="1000" type="number" placeholder="Limit results for pharmacy..." aria-label="Limit" />
                     </div>
 
                     <button className="btn btn-outline-success" type="submit">Search</button>
