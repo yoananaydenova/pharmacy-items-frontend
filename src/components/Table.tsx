@@ -46,7 +46,7 @@ const Table = ({ items }: TableProps) => {
               <tr key={index}>
                 <th scope="row">{index + 1}</th>
                 <td>
-                  <img src={item.imageUrl} className="w-50" alt={item.itemName} />
+                  <img src={item.imageUrl} className="img-fluid img-thumbnail item-img" alt={item.itemName} />
                 </td>
                 <td >
                   <a href={getPharmacyUrl(item.itemUrl)} rel="noopener noreferrer" target="_blank">

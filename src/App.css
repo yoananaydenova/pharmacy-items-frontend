@@ -4,3 +4,15 @@
   padding: 2rem;
   text-align: center;
 }
+
+.item-img {
+  height: auto;
+  max-height: 150px !important;
+}
+
+tbody th,
+tbody td {
+  height: 150px !important;
+  max-height: 150px !important;
+  min-height: 150px !important;
+}
