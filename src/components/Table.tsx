@@ -12,7 +12,7 @@ type TableProps = {
 
 const Table = ({ items }: TableProps) => {
 
-  const getPharmacyCellCss = (pharmacyName: string) => {
+  const getPharmacyNameCss = (pharmacyName: string) => {
     if (pharmacyName == "SOpharmacy")
       return "badge bg-success"
     if (pharmacyName == "Subra")
@@ -21,6 +21,10 @@ const Table = ({ items }: TableProps) => {
       return "badge bg-danger"
 
     return "badge bg-white"
+  }
+
+  const getPharmacyUrl = (itemUrl: string) => {
+    return itemUrl.substring(0, itemUrl.indexOf(".bg") + 3);
   }
 
 
@@ -45,7 +49,9 @@ const Table = ({ items }: TableProps) => {
                   <img src={item.imageUrl} className="w-50" alt={item.itemName} />
                 </td>
                 <td >
-                  <span className={getPharmacyCellCss(item.pharmacyName)}>{item.pharmacyName}</span>
+                  <a href={getPharmacyUrl(item.itemUrl)} rel="noopener noreferrer" target="_blank">
+                    <span className={getPharmacyNameCss(item.pharmacyName)}>{item.pharmacyName}</span>
+                  </a>
                 </td>
                 <td>
                   <a href={item.itemUrl} rel="noopener noreferrer" target="_blank">{item.itemName}</a>
