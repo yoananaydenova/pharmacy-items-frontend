@@ -1,7 +1,7 @@
 import { useState } from "react"
-import axios from "axios"
 import Table from "./Table";
 import Loading from "./Loading";
+import { request } from '../helpers/axios_helper.ts';
 
 type FormData = {
     pharms: string[];
@@ -60,8 +60,11 @@ const Search = () => {
 
         const requestParams = { ...searchData, pharms: searchData.pharms.toString() }
 
-        axios.get('http://localhost:8080/items'
-            , { params: requestParams }
+        request(
+            "GET",
+            "/search",
+            requestParams,
+            {}
         ).then(res => {
             setItems(res.data);
             setLoading(false);
