@@ -1,9 +1,21 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { setAuthHeader } from "../helpers/axios_helper";
 
-type NavbarProps = {isLoggedIn:boolean}
+type NavbarProps = {
+    isLoggedIn: boolean,
+    setIsLoggedIn: Function
+}
 
 
-const Navbar = ({ isLoggedIn}: NavbarProps ) => {
+const Navbar = ({ isLoggedIn, setIsLoggedIn }: NavbarProps) => {
+
+    const navigate = useNavigate();
+
+    const logout = () => {
+        setAuthHeader(null);
+        setIsLoggedIn(false);
+        navigate("/");
+    };
 
     return (
         <nav className="navbar bg-light rounded px-5">
@@ -11,8 +23,9 @@ const Navbar = ({ isLoggedIn}: NavbarProps ) => {
             <div className="d-flex flex-row justify-content-between w-25 align-items-center">
 
                 <NavLink to="/" className="nav-link" >Search</NavLink>
+                <NavLink to="/dashboard" className="nav-link" >Message</NavLink>
                 {isLoggedIn ?
-                    <NavLink to="/" className="btn btn-outline-secondary px-2 py-1">Logout</NavLink>
+                    <button onClick={logout} className="btn btn-outline-secondary px-2 py-1">Logout</button>
                     :
                     <NavLink to="/login" className="btn btn-secondary px-2 py-1" >Login</NavLink>
                 }
