@@ -23,7 +23,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: NavbarProps) => {
             <div className="d-flex flex-row justify-content-between w-25 align-items-center">
 
                 <NavLink to="/" className="nav-link" >Search</NavLink>
-                <NavLink to="/dashboard" className="nav-link" >Message</NavLink>
+                {isLoggedIn ? <NavLink to="/dashboard" className="nav-link" >Dashboard</NavLink> : null}
                 {isLoggedIn ?
                     <button onClick={logout} className="btn btn-outline-secondary px-2 py-1">Logout</button>
                     :
