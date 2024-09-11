@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import { useNavigate } from "react-router-dom";
 
 type LoginProps = {
-    onLogin: () => void,
-    onRegister: () => void
+    onLogin: Function,
+    onRegister: Function
 }
 
 const Login = ({ onLogin, onRegister }: LoginProps) => {
