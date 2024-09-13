@@ -1,7 +1,7 @@
 const FilledHeart = ({ width, height }: { width: string, height: string }) => {
     return (
         <svg width={width} height={height} version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 512.002 512.002" xmlSpace="preserve" fill="#000000">
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
+            <g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round">
             </g>
             <g id="SVGRepo_iconCarrier">
                 <path style={{ fill: "#ff877f" }} d="M255.998,474.506l201.958-201.958c26.556-26.556,41.182-61.909,41.182-99.558 s-14.626-73.003-41.182-99.558c-26.59-26.598-61.943-41.242-99.558-41.242c-33.493,0-66.21,12.442-92.433,35.337l-9.967,9.327 l-10.291-9.617C219.808,44.63,187.1,32.189,153.598,32.189c-37.615,0-72.969,14.643-99.558,41.242 c-26.556,26.556-41.182,61.909-41.182,99.558S27.484,246,54.039,272.547L255.998,474.506z">
