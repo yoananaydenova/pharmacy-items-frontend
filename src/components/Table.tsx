@@ -1,16 +1,16 @@
-type Item = {
-  pharmacyName: string,
-  itemName: string,
-  price: number,
-  itemUrl: string,
-  imageUrl: string
-}
+import FilledHeart from "../icons/FilledHeart"
+import OutlinedHeart from "../icons/OutlinedHeart"
+import { Item } from "./Item"
 
 type TableProps = {
-  items: Item[]
+  items: Item[],
+  isFavorite: (itemUrl: string) => boolean,
+  addOrRemoveUrlFromFavorites: (item: Item) => void
 }
 
-const Table = ({ items }: TableProps) => {
+
+const Table = ({ items, isFavorite, addOrRemoveUrlFromFavorites }: TableProps) => {
+
 
   const getPharmacyNameCss = (pharmacyName: string) => {
     if (pharmacyName == "SOpharmacy")
@@ -53,8 +53,12 @@ const Table = ({ items }: TableProps) => {
                     <span className={getPharmacyNameCss(item.pharmacyName)}>{item.pharmacyName}</span>
                   </a>
                 </td>
-                <td>
+                <td className="position-relative">
                   <a href={item.itemUrl} rel="noopener noreferrer" target="_blank">{item.itemName}</a>
+                  <button onClick={() => addOrRemoveUrlFromFavorites(item)} className="btn btn-light rounded-pill position-absolute bottom-0 start-50 translate-middle">
+                    {isFavorite(item.itemUrl) ? <FilledHeart width="20px" height="20px" /> : <OutlinedHeart width="20px" height="20px" />}
+                  </button>
+
                 </td>
                 <td className={item.price == null ? "text-danger" : "text-dark"}>{item.price == null ? "Изчерпан" : item.price}</td>
               </tr>
