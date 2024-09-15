@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import Search from './components/Search'
 import { useState } from "react";
 import Dashboard from "./components/Dashboard.tsx";
+import { Toaster } from "react-hot-toast";
 
 function App() {
 
@@ -60,6 +61,7 @@ function App() {
   return (
     <BrowserRouter>
       <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+      <Toaster />
       <Routes>
         <Route element={<Search />} path="/" />
         <Route element={<Dashboard />} path="/dashboard" />
