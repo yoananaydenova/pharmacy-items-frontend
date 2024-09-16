@@ -11,7 +11,18 @@ import { Toaster } from "react-hot-toast";
 
 function App() {
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [login, setLogin] = useState(false);
+
+  const logout = () => {
+    setAuthHeader(null);
+    setLogin(false);
+  };
+
+  const handleLogin = (token: string) => {
+    setAuthHeader(token);
+    setLogin(true);
+  }
+
 
   const onLogin = (username: string, password: string) => {
 
@@ -24,12 +35,10 @@ function App() {
         password: password
       }).then(
         (response) => {
-          setAuthHeader(response.data.token);
-          setIsLoggedIn(true);
+          handleLogin(response.data.token);
         }).catch(
           (error) => {
-            setAuthHeader(null);
-            setIsLoggedIn(false);
+            logout();
           }
         );
   };
@@ -49,22 +58,25 @@ function App() {
         password: password
       }).then(
         (response) => {
-          setAuthHeader(response.data.token);
-          setIsLoggedIn(true);
+          handleLogin(response.data.token);
         }).catch(
           (error) => {
-            setAuthHeader(null);
-            setIsLoggedIn(false);
+            logout();
           }
         );
   };
   return (
     <BrowserRouter>
-      <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+      <Navbar
+        login={login}
+        logout={logout}
+      />
       <Toaster />
       <Routes>
-        <Route element={<Search />} path="/" />
-        <Route element={<Dashboard />} path="/dashboard" />
+        <Route element={<Search login={login} />} path="/" />
+        {login &&
+          <Route element={<Dashboard />} path="/dashboard" />
+        }
         <Route element={<Login onLogin={onLogin} onRegister={onRegister} />} path="/login" />
       </Routes>
 
