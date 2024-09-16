@@ -1,7 +1,12 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Table from "./Table";
 import Loading from "./Loading";
-import { request } from '../helpers/axios_helper.ts';
+import { request, setAuthHeader } from '../helpers/axios_helper.ts';
+import toast from "react-hot-toast";
+import { Item } from "./Item.tsx";
+import SaveButton from "./SaveButton.tsx";
+import Select from "react-select";
+
 
 type FormData = {
     pharms: string[];
@@ -9,10 +14,58 @@ type FormData = {
     text: string
 }
 
-const Search = () => {
+type SearchProps = {
+    login: boolean
+}
+
+type SearchDropdownProps = {
+    value: string,
+    label: string
+}
+
+const options = [
+    { value: 'chocolate', label: 'Chocolate abcd ssdf sadfsagsagsgsagsagammmmmmmmmmmmmmmmmmmmmmmmms' },
+    { value: 'strawberry', label: 'Strawberry' },
+    { value: 'vanilla', label: 'Vanilla' }
+];
+
+const Search = ({ login }: SearchProps) => {
 
     const [items, setItems] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const [favorites, setFavorites] = useState<string[]>([]);
+    const [selectedSearch, setSelectedSearch] = useState<null | SearchDropdownProps>(null);
+
+
+
+    useEffect(() => {
+        if (login) {
+            loadFavorites();
+        }
+
+    }, []);
+
+    const loadFavorites = () => {
+        request(
+            "GET",
+            "/favorites",
+            {},
+            {}
+        ).then(
+            (response) => {
+                setFavorites(response.data)
+            }).catch(
+                (error) => {
+                    if (error.response.status === 401) {
+                        setAuthHeader(null);
+                    } else {
+                        setFavorites(error.response.code)
+                    }
+                }
+            );
+    }
+
 
     const [searchData, setSearchData] = useState<FormData>(
         {
@@ -23,6 +76,8 @@ const Search = () => {
     )
 
     const onPharmacyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+        setLoading(false);
 
         const newValue: string = e.target.value;
 
@@ -43,6 +98,8 @@ const Search = () => {
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
+        setLoading(false);
+
         let { name, value, min, max } = e.target;
 
         let newValue: string | number = value;
@@ -50,15 +107,52 @@ const Search = () => {
             newValue = Math.max(Number(min), Math.min(Number(max), Number(value)));
         }
 
+        if (name === "text") {
+            setSelectedSearch(null);
+        }
+
         setSearchData({ ...searchData, [name]: newValue })
+    }
+
+    const getErrorMessages = () => {
+        const messages = [];
+        if (searchData.text.trim().length == 0) {
+            messages.push("The search text can't be empty string!");
+        }
+
+        if (searchData.pharms.length == 0) {
+            messages.push("You must choose at least 1 pharmacy!");
+        }
+
+        if (searchData.limit < 1) {
+            messages.push("The limit must be more than 0!");
+        }
+
+        if (searchData.limit > 1000) {
+            messages.push("The limit must be less than 1000!");
+        }
+
+        if (messages.length > 0) {
+            return messages.join("\n");
+        }
+
+        return "";
     }
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
+        const errorMessages = getErrorMessages();
+        if (errorMessages.length > 0) {
+            toast.error(errorMessages);
+
+            return;
+        }
+
         setLoading(true);
 
         const requestParams = { ...searchData, pharms: searchData.pharms.toString() }
+
 
         request(
             "GET",
@@ -73,15 +167,85 @@ const Search = () => {
 
     }
 
+    const isFavorite = (itemUrl: string) => {
+        const result = favorites.filter((item: string) => item === itemUrl);
+        return result.length > 0;
+    }
+
+    const addOrRemoveUrlFromFavorites = (item: Item) => {
+        if (isFavorite(item.itemUrl)) {
+            removeFromFavorites(item.itemUrl);
+            setFavorites((favorites) => favorites.filter((favUrl) => favUrl !== item.itemUrl));
+        } else {
+            addToFavorites(item)
+            setFavorites((prevState) =>
+                [...prevState, item.itemUrl]
+            );
+        }
+    }
+
+    const addToFavorites = (item: Item) => {
+        console.log('add ' + item.itemUrl)
+    }
+
+    const removeFromFavorites = (itemUrl: string) => {
+        console.log('remove ' + itemUrl)
+    }
+
+
+    const saveSearch = () => {
+        // TODO add to saved search
+        toast.success("Successfully saved search!");
+    }
+
+    const handleDropdownChange = (selectedSearch: null | SearchDropdownProps) => {
+        console.log('selectedSearch', selectedSearch)
+        setSelectedSearch(selectedSearch);
+    }
+
+
+    const styles = {
+        control: (css) => ({
+            ...css,
+            width: 460
+        }),
+        menu: ({ width, ...css }) => ({
+            ...css,
+            width: "max-content",
+            minWidth: "20%"
+        }),
+        // Add padding to account for width of Indicators Container plus padding
+        option: (css) => ({ ...css, width: 500 })
+    };
+
     return (
         <>
             <div className="container d-flex flex-column justify-content-center w-50 mt-5">
-                <form onSubmit={handleSubmit} className="d-flex flex-column" role="search">
+                <form onSubmit={handleSubmit} className="d-flex flex-column " role="search">
+
 
                     <input onChange={onInputChange} name="text" className="form-control input-lg mb-3" type="text" placeholder="Search pharmacy item..." aria-label="Search" />
 
-                    <div className="mx-auto">
+
+
+
+                    {login && <div className="d-flex flex-row mb-3 gap-2">
+
+                        <Select
+                            options={options}
+                            value={selectedSearch}
+                            onChange={handleDropdownChange}
+                            placeholder={"Select saved search..."}
+                            styles={styles}
+
+                        />
+                        <SaveButton onClick={saveSearch} />
+                    </div>}
+
+                    <div className="align-self-center">
+
                         <div className="d-flex flex-column mb-3 align-items-start">
+
                             <label >Choose pharmacy:</label>
                             <div className="form-check">
                                 <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="1" id="sopharmacy" />
@@ -97,21 +261,22 @@ const Search = () => {
                                 <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="3" id="remedium" />
                                 <label className="form-check-label" htmlFor="remedium">remedium.bg</label>
                             </div>
-
                         </div>
-                        <div className="d-flex flex-column b align-items-start">
+
+                        <div className="d-flex flex-column align-items-start">
                             <label >Choose limit:</label>
                             <input onChange={onInputChange} name="limit" defaultValue="1" className="form-control input-lg mb-3" min="1" max="1000" type="number" placeholder="Limit results for pharmacy..." aria-label="Limit" />
                         </div>
 
                         <button className="btn btn-outline-success" type="submit">Search</button>
                     </div>
+
                 </form>
 
             </div>
             <div className="container d-flex flex-column justify-content-center w-80 mt-5">
                 {loading && <Loading />}
-                {!loading && items.length > 0 && <Table items={items} />}
+                {!loading && items.length > 0 && <Table items={items} isFavorite={isFavorite} addOrRemoveUrlFromFavorites={addOrRemoveUrlFromFavorites} />}
             </div>
         </>
     )
