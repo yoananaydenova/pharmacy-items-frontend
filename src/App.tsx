@@ -75,7 +75,7 @@ function App() {
       <Routes>
         <Route element={<Search login={login} />} path="/" />
         {login &&
-          <Route element={<Dashboard />} path="/dashboard" />
+          <Route element={<Dashboard login={login} />} path="/dashboard" />
         }
         <Route element={<Login onLogin={onLogin} onRegister={onRegister} />} path="/login" />
       </Routes>

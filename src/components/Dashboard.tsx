@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react"
 import { request, setAuthHeader } from "../helpers/axios_helper";
+import Table from "./Table";
 
-const Dashboard = () => {
+type DashboardProps = {
+    login: boolean
+}
+
+const Dashboard = ({ login }: DashboardProps) => {
     const [favorites, setFavorites] = useState([])
 
     useEffect(() => {
@@ -28,23 +33,18 @@ const Dashboard = () => {
                 }
             );
     }
+
+    console.log('favorites', favorites)
     return (
-        <div className="row justify-content-md-center">
-            <div className="col-4">
-                <div className="card" style={{ width: "18rem" }}>
-                    <div className="card-body">
-                        <h5 className="card-title">Dashboard</h5>
-                        <p className="card-text">Content:</p>
-                        <ul>
-                            {favorites && favorites
-                                .map((line) =>
-                                    <li key={line}>{line}</li>
-                                )
-                            }
-                        </ul>
-                    </div>
+        <div className="mt-5">
+
+            <div className="card" >
+                <h3 className="card-header bg-light">Favorite items:</h3>
+                <div className="card-body">
+                    <Table items={favorites} login={login} />
                 </div>
             </div>
+
         </div>
 
     )
