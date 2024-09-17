@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Table from "./Table";
 import Loading from "./Loading";
-import { request, setAuthHeader } from '../helpers/axios_helper.ts';
+import { request } from '../helpers/axios_helper.ts';
 import toast from "react-hot-toast";
-import { Item } from "./Item.tsx";
 import SaveButton from "./SaveButton.tsx";
 import Select from "react-select";
 
@@ -33,39 +32,7 @@ const Search = ({ login }: SearchProps) => {
 
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState<boolean>(false);
-
-    const [favorites, setFavorites] = useState<string[]>([]);
     const [selectedSearch, setSelectedSearch] = useState<null | SearchDropdownProps>(null);
-
-
-
-    useEffect(() => {
-        if (login) {
-            loadFavorites();
-        }
-
-    }, []);
-
-    const loadFavorites = () => {
-        request(
-            "GET",
-            "/favorites",
-            {},
-            {}
-        ).then(
-            (response) => {
-                setFavorites(response.data)
-            }).catch(
-                (error) => {
-                    if (error.response.status === 401) {
-                        setAuthHeader(null);
-                    } else {
-                        setFavorites(error.response.code)
-                    }
-                }
-            );
-    }
-
 
     const [searchData, setSearchData] = useState<FormData>(
         {
@@ -167,32 +134,6 @@ const Search = ({ login }: SearchProps) => {
 
     }
 
-    const isFavorite = (itemUrl: string) => {
-        const result = favorites.filter((item: string) => item === itemUrl);
-        return result.length > 0;
-    }
-
-    const addOrRemoveUrlFromFavorites = (item: Item) => {
-        if (isFavorite(item.itemUrl)) {
-            removeFromFavorites(item.itemUrl);
-            setFavorites((favorites) => favorites.filter((favUrl) => favUrl !== item.itemUrl));
-        } else {
-            addToFavorites(item)
-            setFavorites((prevState) =>
-                [...prevState, item.itemUrl]
-            );
-        }
-    }
-
-    const addToFavorites = (item: Item) => {
-        console.log('add ' + item.itemUrl)
-    }
-
-    const removeFromFavorites = (itemUrl: string) => {
-        console.log('remove ' + itemUrl)
-    }
-
-
     const saveSearch = () => {
         // TODO add to saved search
         toast.success("Successfully saved search!");
@@ -214,7 +155,6 @@ const Search = ({ login }: SearchProps) => {
             width: "max-content",
             minWidth: "20%"
         }),
-        // Add padding to account for width of Indicators Container plus padding
         option: (css) => ({ ...css, width: 500 })
     };
 
@@ -276,7 +216,10 @@ const Search = ({ login }: SearchProps) => {
             </div>
             <div className="container d-flex flex-column justify-content-center w-80 mt-5">
                 {loading && <Loading />}
-                {!loading && items.length > 0 && <Table items={items} isFavorite={isFavorite} addOrRemoveUrlFromFavorites={addOrRemoveUrlFromFavorites} />}
+                {!loading && items.length > 0 &&
+                    <Table items={items}
+                        login={login}
+                    />}
             </div>
         </>
     )

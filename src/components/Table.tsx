@@ -1,16 +1,69 @@
+import { useEffect, useState } from "react"
 import FilledHeart from "../icons/FilledHeart"
 import OutlinedHeart from "../icons/OutlinedHeart"
 import { Item } from "./Item"
+import { request, setAuthHeader } from "../helpers/axios_helper"
 
 type TableProps = {
   items: Item[],
-  isFavorite: (itemUrl: string) => boolean,
-  addOrRemoveUrlFromFavorites: (item: Item) => void
+  login: boolean
 }
 
+const Table = ({ items, login }: TableProps) => {
 
-const Table = ({ items, isFavorite, addOrRemoveUrlFromFavorites }: TableProps) => {
+  const [favorites, setFavorites] = useState<string[]>([]);
 
+  useEffect(() => {
+    if (login) {
+      loadFavorites();
+    }
+
+  }, []);
+
+  const loadFavorites = () => {
+    request(
+      "GET",
+      "/favorites",
+      {},
+      {}
+    ).then(
+      (response) => {
+        setFavorites(response.data)
+      }).catch(
+        (error) => {
+          if (error.response.status === 401) {
+            setAuthHeader(null);
+          } else {
+            setFavorites(error.response.code)
+          }
+        }
+      );
+  }
+
+  const isFavorite = (itemUrl: string) => {
+    const result = favorites.filter((item: string) => item === itemUrl);
+    return result.length > 0;
+  }
+
+  const addOrRemoveFromFavorites = (item: Item) => {
+    if (isFavorite(item.itemUrl)) {
+      removeFromFavorites(item.itemUrl);
+      setFavorites((favorites) => favorites.filter((favUrl) => favUrl !== item.itemUrl));
+    } else {
+      addToFavorites(item)
+      setFavorites((prevState) =>
+        [...prevState, item.itemUrl]
+      );
+    }
+  }
+
+  const addToFavorites = (item: Item) => {
+    console.log('add ' + item.itemUrl)
+  }
+
+  const removeFromFavorites = (itemUrl: string) => {
+    console.log('remove ' + itemUrl)
+  }
 
   const getPharmacyNameCss = (pharmacyName: string) => {
     if (pharmacyName == "SOpharmacy")
@@ -55,7 +108,7 @@ const Table = ({ items, isFavorite, addOrRemoveUrlFromFavorites }: TableProps) =
                 </td>
                 <td className="position-relative">
                   <a href={item.itemUrl} rel="noopener noreferrer" target="_blank">{item.itemName}</a>
-                  <button onClick={() => addOrRemoveUrlFromFavorites(item)} className="btn btn-light rounded-pill position-absolute bottom-0 start-50 translate-middle">
+                  <button onClick={() => addOrRemoveFromFavorites(item)} className="btn btn-light rounded-pill position-absolute bottom-0 start-50 translate-middle">
                     {isFavorite(item.itemUrl) ? <FilledHeart width="20px" height="20px" /> : <OutlinedHeart width="20px" height="20px" />}
                   </button>
 
