@@ -14,7 +14,8 @@ type FormData = {
 }
 
 type SearchProps = {
-    login: boolean
+    login: boolean,
+    logout: () => void
 }
 
 type SearchDropdownProps = {
@@ -28,7 +29,7 @@ const options = [
     { value: 'vanilla', label: 'Vanilla' }
 ];
 
-const Search = ({ login }: SearchProps) => {
+const Search = ({ login, logout }: SearchProps) => {
 
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState<boolean>(false);
@@ -217,8 +218,10 @@ const Search = ({ login }: SearchProps) => {
             <div className="container d-flex flex-column justify-content-center w-80 mt-5">
                 {loading && <Loading />}
                 {!loading && items.length > 0 &&
-                    <Table items={items}
+                    <Table
+                        items={items}
                         login={login}
+                        logout={logout}
                     />}
             </div>
         </>

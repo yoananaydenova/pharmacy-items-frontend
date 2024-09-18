@@ -73,9 +73,9 @@ function App() {
       />
       <Toaster />
       <Routes>
-        <Route element={<Search login={login} />} path="/" />
+        <Route element={<Search login={login} logout={logout} />} path="/" />
         {login &&
-          <Route element={<Dashboard login={login} />} path="/dashboard" />
+          <Route element={<Dashboard login={login} logout={logout} />} path="/dashboard" />
         }
         <Route element={<Login onLogin={onLogin} onRegister={onRegister} />} path="/login" />
       </Routes>

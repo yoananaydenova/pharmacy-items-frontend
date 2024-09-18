@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react"
 import { request, setAuthHeader } from "../helpers/axios_helper";
 import Table from "./Table";
+import { Item } from "./Item";
 
 type DashboardProps = {
-    login: boolean
+    login: boolean,
+    logout: () => void
 }
 
-const Dashboard = ({ login }: DashboardProps) => {
-    const [favorites, setFavorites] = useState([])
+const Dashboard = ({ login, logout }: DashboardProps) => {
+
+    const [favorites, setFavorites] = useState<Item[]>([])
 
     useEffect(() => {
         loadFavorites();
@@ -34,14 +37,17 @@ const Dashboard = ({ login }: DashboardProps) => {
             );
     }
 
-    console.log('favorites', favorites)
+    const removeItem = (itemUrl: string) => {
+        setFavorites((favorites) => favorites.filter((favUrl) => favUrl.itemUrl !== itemUrl));
+    }
+
     return (
         <div className="mt-5">
 
             <div className="card" >
                 <h3 className="card-header bg-light">Favorite items:</h3>
                 <div className="card-body">
-                    <Table items={favorites} login={login} />
+                    <Table items={favorites} login={login} logout={logout} removeItem={removeItem} />
                 </div>
             </div>
 

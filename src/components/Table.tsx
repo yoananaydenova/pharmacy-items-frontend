@@ -2,16 +2,25 @@ import { useEffect, useState } from "react"
 import FilledHeart from "../icons/FilledHeart"
 import OutlinedHeart from "../icons/OutlinedHeart"
 import { Item } from "./Item"
-import { request, setAuthHeader } from "../helpers/axios_helper"
+import { request } from "../helpers/axios_helper"
+import toast from "react-hot-toast"
+
 
 type TableProps = {
   items: Item[],
-  login: boolean
+  removeItem?: (itemUrl: string) => void,
+  login: boolean,
+  logout: () => void
 }
 
-const Table = ({ items, login }: TableProps) => {
+type FavoriteItem = {
+  id: number,
+  itemUrl: string
+}
 
-  const [favorites, setFavorites] = useState<string[]>([]);
+const Table = ({ items, removeItem, login, logout }: TableProps) => {
+
+  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
 
   useEffect(() => {
     if (login) {
@@ -28,41 +37,90 @@ const Table = ({ items, login }: TableProps) => {
       {}
     ).then(
       (response) => {
-        setFavorites(response.data)
+
+        setFavorites(response.data.map((item: Item) => ({ id: item.id, itemUrl: item.itemUrl })))
+
       }).catch(
         (error) => {
+          console.log('error', error)
           if (error.response.status === 401) {
-            setAuthHeader(null);
+            logout()
+            toast.error("The user was logged out!");
           } else {
-            setFavorites(error.response.code)
+            toast.error(error.response.code);
           }
         }
       );
   }
 
   const isFavorite = (itemUrl: string) => {
-    const result = favorites.filter((item: string) => item === itemUrl);
+    const result = favorites.filter((favItem: FavoriteItem) => favItem.itemUrl === itemUrl);
     return result.length > 0;
   }
 
   const addOrRemoveFromFavorites = (item: Item) => {
     if (isFavorite(item.itemUrl)) {
-      removeFromFavorites(item.itemUrl);
-      setFavorites((favorites) => favorites.filter((favUrl) => favUrl !== item.itemUrl));
+      const resultItem = favorites.filter((favItem: FavoriteItem) => favItem.itemUrl === item.itemUrl);
+      removeFromFavorites(resultItem[0]);
     } else {
       addToFavorites(item)
-      setFavorites((prevState) =>
-        [...prevState, item.itemUrl]
-      );
+
     }
   }
 
   const addToFavorites = (item: Item) => {
-    console.log('add ' + item.itemUrl)
+
+    request(
+      "POST",
+      "/favorites",
+      {},
+      item
+    ).then(
+      (response) => {
+
+        const addedItem = response.data;
+
+        setFavorites((prevState) =>
+          [...prevState, { id: addedItem.id, itemUrl: addedItem.itemUrl }]
+        );
+
+        toast.success("The item: " + addedItem.itemName + " is succesfully added!")
+
+      }).catch(
+        (error) => {
+          if (error.response.status === 401) {
+            logout();
+            toast.error("Тhe user was logged out!");
+          } else {
+            toast.error(error.response.code);
+          }
+        }
+      );
   }
 
-  const removeFromFavorites = (itemUrl: string) => {
-    console.log('remove ' + itemUrl)
+  const removeFromFavorites = (item: FavoriteItem) => {
+    request(
+      "DELETE",
+      `/favorites/${item.id}`,
+      {},
+      {}
+    ).then(
+      (response) => {
+
+        setFavorites((favorites) => favorites.filter((favUrl) => favUrl.itemUrl !== item.itemUrl));
+        removeItem && removeItem(item.itemUrl)
+        toast.success(response.data)
+
+      }).catch(
+        (error) => {
+          if (error.response.status === 401) {
+            logout();
+            toast.error("Тhe user was logged out!");
+          } else {
+            toast.error(error.response.code);
+          }
+        }
+      );
   }
 
   const getPharmacyNameCss = (pharmacyName: string) => {
