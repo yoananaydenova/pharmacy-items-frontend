@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Table from "./Table";
 import Loading from "./Loading";
 import { request } from '../helpers/axios_helper.ts';
@@ -23,6 +23,12 @@ type SearchDropdownProps = {
     label: string
 }
 
+type SearchData = {
+    searchedText: string,
+    searchLimit: number,
+    pharmacies: string[]
+}
+
 const options = [
     { value: 'chocolate', label: 'Chocolate abcd ssdf sadfsagsagsgsagsagammmmmmmmmmmmmmmmmmmmmmmmms' },
     { value: 'strawberry', label: 'Strawberry' },
@@ -34,6 +40,35 @@ const Search = ({ login, logout }: SearchProps) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedSearch, setSelectedSearch] = useState<null | SearchDropdownProps>(null);
+
+    const [searches, setSearches] = useState<[SearchData] | []>([]);
+    useEffect(() => {
+        loadSearches();
+    }, []);
+
+    const loadSearches = () => {
+        request(
+            "GET",
+            "/searches",
+            {},
+            {}
+        ).then(
+            (response) => {
+
+                setSearches(response.data)
+
+            }).catch(
+                (error) => {
+                    console.log('error', error)
+                    if (error.response.status === 401) {
+                        logout()
+                        toast.error("The user was logged out!");
+                    } else {
+                        toast.error(error.response.code);
+                    }
+                }
+            );
+    }
 
     const [searchData, setSearchData] = useState<FormData>(
         {
@@ -189,17 +224,17 @@ const Search = ({ login, logout }: SearchProps) => {
 
                             <label >Choose pharmacy:</label>
                             <div className="form-check">
-                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="1" id="sopharmacy" />
+                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="SOPHARMACY" id="sopharmacy" />
                                 <label className="form-check-label" htmlFor="sopharmacy">sopharmacy.bg</label>
                             </div>
 
                             <div className="form-check">
-                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="2" id="subra" />
+                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="SUBRA" id="subra" />
                                 <label className="form-check-label" htmlFor="subra">subra.bg</label>
                             </div>
 
                             <div className="form-check">
-                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="3" id="remedium" />
+                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="REMEDIUM" id="remedium" />
                                 <label className="form-check-label" htmlFor="remedium">remedium.bg</label>
                             </div>
                         </div>
