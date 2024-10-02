@@ -40,8 +40,15 @@ const Search = ({ login, logout }: SearchProps) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedSearch, setSelectedSearch] = useState<null | SearchDropdownProps>(null);
-
+    const [searchData, setSearchData] = useState<FormData>(
+        {
+            pharms: [],
+            limit: 1,
+            text: ""
+        }
+    )
     const [searches, setSearches] = useState<[SearchData] | []>([]);
+
     useEffect(() => {
         loadSearches();
     }, []);
@@ -70,13 +77,6 @@ const Search = ({ login, logout }: SearchProps) => {
             );
     }
 
-    const [searchData, setSearchData] = useState<FormData>(
-        {
-            pharms: [],
-            limit: 1,
-            text: ""
-        }
-    )
 
     const onPharmacyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
@@ -172,11 +172,40 @@ const Search = ({ login, logout }: SearchProps) => {
 
     const saveSearch = () => {
         // TODO add to saved search
-        toast.success("Successfully saved search!");
+        request(
+            "POST",
+            "/searches",
+            {},
+            {
+                searchedText: searchData.text,
+                pharmacies: searchData.pharms,
+                searchLimit: searchData.limit,
+            }
+        ).then(
+            (response) => {
+
+                const addedItem = response.data;
+
+                //   setFavorites((prevState) =>
+                //     [...prevState, { id: addedItem.id, itemUrl: addedItem.itemUrl }]
+                //   );
+
+                toast.success("Successfully saved search!");
+
+            }).catch(
+                (error) => {
+                    if (error.response.status === 401) {
+                        logout();
+                        toast.error("Тhe user was logged out!");
+                    } else {
+                        toast.error(error.response.code);
+                    }
+                }
+            );
+
     }
 
     const handleDropdownChange = (selectedSearch: null | SearchDropdownProps) => {
-        console.log('selectedSearch', selectedSearch)
         setSelectedSearch(selectedSearch);
     }
 
