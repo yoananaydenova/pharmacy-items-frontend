@@ -7,20 +7,18 @@ import SaveButton from "./SaveButton.tsx";
 import Select from "react-select";
 
 
-type FormData = {
-    pharms: string[];
-    limit: number;
-    text: string
-}
+
 
 type SearchProps = {
     login: boolean,
     logout: () => void
 }
 
-type SearchDropdownProps = {
-    value: string,
-    label: string
+
+type FormData = {
+    text: string,
+    limit: number,
+    pharms: string[],
 }
 
 type SearchData = {
@@ -29,17 +27,17 @@ type SearchData = {
     pharmacies: string[]
 }
 
-const options = [
-    { value: 'chocolate', label: 'Chocolate abcd ssdf sadfsagsagsgsagsagammmmmmmmmmmmmmmmmmmmmmmmms' },
-    { value: 'strawberry', label: 'Strawberry' },
-    { value: 'vanilla', label: 'Vanilla' }
-];
+type OptionData = {
+    label: string,
+    value: SearchData
+}
+
 
 const Search = ({ login, logout }: SearchProps) => {
 
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [selectedSearch, setSelectedSearch] = useState<null | SearchDropdownProps>(null);
+    const [selectedSearch, setSelectedSearch] = useState<null | OptionData>(null);
     const [searchData, setSearchData] = useState<FormData>(
         {
             pharms: [],
@@ -47,7 +45,7 @@ const Search = ({ login, logout }: SearchProps) => {
             text: ""
         }
     )
-    const [searches, setSearches] = useState<[SearchData] | []>([]);
+    const [options, setOptions] = useState<OptionData[] | []>([]);
 
     useEffect(() => {
         loadSearches();
@@ -62,11 +60,13 @@ const Search = ({ login, logout }: SearchProps) => {
         ).then(
             (response) => {
 
-                setSearches(response.data)
+                const result: [OptionData] = response.data.map((s: SearchData) => ({ "label": s.searchedText, "value": s }))
+
+                setOptions(result)
 
             }).catch(
                 (error) => {
-                    console.log('error', error)
+
                     if (error.response.status === 401) {
                         logout()
                         toast.error("The user was logged out!");
@@ -86,10 +86,10 @@ const Search = ({ login, logout }: SearchProps) => {
 
         let newArr: string[] = [...searchData.pharms];
 
-        if (!searchData.pharms.find(v => v === newValue)) {
-            newArr.push(newValue);
-        } else {
+        if (searchData.pharms.find(v => v === newValue)) {
             newArr = newArr.filter(v => v != newValue);
+        } else {
+            newArr.push(newValue);
         }
 
         setSearchData((prevState) => ({
@@ -171,7 +171,6 @@ const Search = ({ login, logout }: SearchProps) => {
     }
 
     const saveSearch = () => {
-        // TODO add to saved search
         request(
             "POST",
             "/searches",
@@ -184,11 +183,11 @@ const Search = ({ login, logout }: SearchProps) => {
         ).then(
             (response) => {
 
-                const addedItem = response.data;
+                const responseObj: SearchData = response.data;
+                const resultItem: OptionData = { "label": responseObj.searchedText, "value": responseObj }
 
-                //   setFavorites((prevState) =>
-                //     [...prevState, { id: addedItem.id, itemUrl: addedItem.itemUrl }]
-                //   );
+
+                setOptions(prevState => [...prevState, resultItem]);
 
                 toast.success("Successfully saved search!");
 
@@ -205,7 +204,7 @@ const Search = ({ login, logout }: SearchProps) => {
 
     }
 
-    const handleDropdownChange = (selectedSearch: null | SearchDropdownProps) => {
+    const handleDropdownChange = (selectedSearch: null | OptionData) => {
         setSelectedSearch(selectedSearch);
     }
 
@@ -229,7 +228,7 @@ const Search = ({ login, logout }: SearchProps) => {
                 <form onSubmit={handleSubmit} className="d-flex flex-column " role="search">
 
 
-                    <input onChange={onInputChange} name="text" className="form-control input-lg mb-3" type="text" placeholder="Search pharmacy item..." aria-label="Search" />
+                    <input onChange={onInputChange} value={selectedSearch?.value.searchedText} name="text" className="form-control input-lg mb-3" type="text" placeholder="Search pharmacy item..." aria-label="Search" />
 
 
 
@@ -253,24 +252,24 @@ const Search = ({ login, logout }: SearchProps) => {
 
                             <label >Choose pharmacy:</label>
                             <div className="form-check">
-                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="SOPHARMACY" id="sopharmacy" />
+                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="SOPHARMACY" checked={selectedSearch?.value.pharmacies.includes("SOPHARMACY")} id="sopharmacy" />
                                 <label className="form-check-label" htmlFor="sopharmacy">sopharmacy.bg</label>
                             </div>
 
                             <div className="form-check">
-                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="SUBRA" id="subra" />
+                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="SUBRA" checked={selectedSearch?.value.pharmacies.includes("SUBRA")} id="subra" />
                                 <label className="form-check-label" htmlFor="subra">subra.bg</label>
                             </div>
 
                             <div className="form-check">
-                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="REMEDIUM" id="remedium" />
+                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="REMEDIUM" checked={selectedSearch?.value.pharmacies.includes("REMEDIUM")} id="remedium" />
                                 <label className="form-check-label" htmlFor="remedium">remedium.bg</label>
                             </div>
                         </div>
 
                         <div className="d-flex flex-column align-items-start">
                             <label >Choose limit:</label>
-                            <input onChange={onInputChange} name="limit" defaultValue="1" className="form-control input-lg mb-3" min="1" max="1000" type="number" placeholder="Limit results for pharmacy..." aria-label="Limit" />
+                            <input onChange={onInputChange} value={selectedSearch?.value.searchLimit} name="limit" defaultValue="1" className="form-control input-lg mb-3" min="1" max="1000" type="number" placeholder="Limit results for pharmacy..." aria-label="Limit" />
                         </div>
 
                         <button className="btn btn-outline-success" type="submit">Search</button>
