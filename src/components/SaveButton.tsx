@@ -1,13 +1,15 @@
 type SaveButtonProps = {
+    isDisabled: boolean,
     onClick: () => void
 }
 
-const SaveButton = ({ onClick }: SaveButtonProps) => {
+const SaveButton = ({isDisabled, onClick }: SaveButtonProps) => {
     return (
         <button
             type="button"
             name="Save"
             onClick={onClick}
+            disabled={isDisabled}
             className="btn btn-outline-success w-25 py-0 px-1"
         >
 
