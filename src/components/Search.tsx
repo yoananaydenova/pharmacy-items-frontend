@@ -33,11 +33,20 @@ type OptionData = {
 }
 
 
+const emptyOptionData: OptionData = {
+    label: "",
+    value: {
+        searchedText: "",
+        searchLimit: 1,
+        pharmacies: []
+    }
+}
+
 const Search = ({ login, logout }: SearchProps) => {
 
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [selectedSearch, setSelectedSearch] = useState<null | OptionData>(null);
+    const [selectedSearch, setSelectedSearch] = useState<OptionData>(emptyOptionData);
     const [searchData, setSearchData] = useState<FormData>(
         {
             pharms: [],
@@ -45,7 +54,7 @@ const Search = ({ login, logout }: SearchProps) => {
             text: ""
         }
     )
-    const [options, setOptions] = useState<OptionData[] | []>([]);
+    const [options, setOptions] = useState<OptionData[]>([]);
 
     useEffect(() => {
         loadSearches();
@@ -69,7 +78,6 @@ const Search = ({ login, logout }: SearchProps) => {
 
                     if (error.response.status === 401) {
                         logout()
-                        toast.error("The user was logged out!");
                     } else {
                         toast.error(error.response.code);
                     }
@@ -111,7 +119,7 @@ const Search = ({ login, logout }: SearchProps) => {
         }
 
         if (name === "text") {
-            setSelectedSearch(null);
+            setSelectedSearch(emptyOptionData);
         }
 
         setSearchData({ ...searchData, [name]: newValue })
@@ -142,8 +150,7 @@ const Search = ({ login, logout }: SearchProps) => {
         return "";
     }
 
-    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-        event.preventDefault();
+    const handleSearch = () => {
 
         const errorMessages = getErrorMessages();
         if (errorMessages.length > 0) {
@@ -155,7 +162,6 @@ const Search = ({ login, logout }: SearchProps) => {
         setLoading(true);
 
         const requestParams = { ...searchData, pharms: searchData.pharms.toString() }
-
 
         request(
             "GET",
@@ -186,8 +192,8 @@ const Search = ({ login, logout }: SearchProps) => {
                 const responseObj: SearchData = response.data;
                 const resultItem: OptionData = { "label": responseObj.searchedText, "value": responseObj }
 
-
                 setOptions(prevState => [...prevState, resultItem]);
+                setSelectedSearch(resultItem);
 
                 toast.success("Successfully saved search!");
 
@@ -197,15 +203,17 @@ const Search = ({ login, logout }: SearchProps) => {
                         logout();
                         toast.error("Тhe user was logged out!");
                     } else {
-                        toast.error(error.response.code);
+                        toast.error(error.response.data.message);
                     }
                 }
             );
 
     }
 
-    const handleDropdownChange = (selectedSearch: null | OptionData) => {
-        setSelectedSearch(selectedSearch);
+    const handleDropdownChange = (selectedSearch: OptionData | null) => {
+        if (selectedSearch !== null) {
+            setSelectedSearch(selectedSearch);
+        }
     }
 
 
@@ -225,12 +233,10 @@ const Search = ({ login, logout }: SearchProps) => {
     return (
         <>
             <div className="container d-flex flex-column justify-content-center w-50 mt-5">
-                <form onSubmit={handleSubmit} className="d-flex flex-column " role="search">
 
+                <div className="d-flex flex-column " role="search">
 
                     <input onChange={onInputChange} value={selectedSearch?.value.searchedText} name="text" className="form-control input-lg mb-3" type="text" placeholder="Search pharmacy item..." aria-label="Search" />
-
-
 
 
                     {login && <div className="d-flex flex-row mb-3 gap-2">
@@ -243,7 +249,7 @@ const Search = ({ login, logout }: SearchProps) => {
                             styles={styles}
 
                         />
-                        <SaveButton onClick={saveSearch} />
+                        <SaveButton isDisabled={selectedSearch !== null} onClick={saveSearch} />
                     </div>}
 
                     <div className="align-self-center">
@@ -269,13 +275,13 @@ const Search = ({ login, logout }: SearchProps) => {
 
                         <div className="d-flex flex-column align-items-start">
                             <label >Choose limit:</label>
-                            <input onChange={onInputChange} value={selectedSearch?.value.searchLimit} name="limit" defaultValue="1" className="form-control input-lg mb-3" min="1" max="1000" type="number" placeholder="Limit results for pharmacy..." aria-label="Limit" />
+                            <input onChange={onInputChange} value={selectedSearch?.value.searchLimit} name="limit" className="form-control input-lg mb-3" min="1" max="1000" type="number" placeholder="Limit results for pharmacy..." aria-label="Limit" />
                         </div>
 
-                        <button className="btn btn-outline-success" type="submit">Search</button>
+                        <button onClick={handleSearch} className="btn btn-outline-success" type="button">Search</button>
                     </div>
 
-                </form>
+                </div>
 
             </div>
             <div className="container d-flex flex-column justify-content-center w-80 mt-5">
