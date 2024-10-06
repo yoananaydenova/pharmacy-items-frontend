@@ -7,13 +7,10 @@ import SaveButton from "./SaveButton.tsx";
 import Select from "react-select";
 
 
-
-
 type SearchProps = {
     login: boolean,
     logout: () => void
 }
-
 
 type FormData = {
     text: string,
@@ -21,7 +18,7 @@ type FormData = {
     pharms: string[],
 }
 
-type SearchData = {
+type FavoriteSearchData = {
     searchedText: string,
     searchLimit: number,
     pharmacies: string[]
@@ -29,38 +26,42 @@ type SearchData = {
 
 type OptionData = {
     label: string,
-    value: SearchData
+    value: FavoriteSearchData
+}
+
+const EMPTY_FORM_DATA = {
+    pharms: [],
+    limit: 1,
+    text: ""
 }
 
 
-const emptyOptionData: OptionData = {
+const EMPTY_FAVORITE_SEARCH_DATA = {
+    searchedText: "",
+    searchLimit: 1,
+    pharmacies: []
+}
+
+const EMPTY_OPTION_DATA: OptionData = {
     label: "",
-    value: {
-        searchedText: "",
-        searchLimit: 1,
-        pharmacies: []
-    }
+    value: EMPTY_FAVORITE_SEARCH_DATA
 }
 
 const Search = ({ login, logout }: SearchProps) => {
 
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [selectedSearch, setSelectedSearch] = useState<OptionData>(emptyOptionData);
-    const [searchData, setSearchData] = useState<FormData>(
-        {
-            pharms: [],
-            limit: 1,
-            text: ""
-        }
-    )
+
+    const [formData, setFormData] = useState<FormData>(EMPTY_FORM_DATA);
+
+    const [selectedOption, setSelectedOption] = useState<OptionData>(EMPTY_OPTION_DATA);
     const [options, setOptions] = useState<OptionData[]>([]);
 
     useEffect(() => {
-        loadSearches();
+        loadOptions();
     }, []);
 
-    const loadSearches = () => {
+    const loadOptions = () => {
         request(
             "GET",
             "/searches",
@@ -69,7 +70,7 @@ const Search = ({ login, logout }: SearchProps) => {
         ).then(
             (response) => {
 
-                const result: [OptionData] = response.data.map((s: SearchData) => ({ "label": s.searchedText, "value": s }))
+                const result: [OptionData] = response.data.map((s: FavoriteSearchData) => ({ "label": s.searchedText, "value": s }))
 
                 setOptions(result)
 
@@ -92,15 +93,15 @@ const Search = ({ login, logout }: SearchProps) => {
 
         const newValue: string = e.target.value;
 
-        let newArr: string[] = [...searchData.pharms];
+        let newArr: string[] = [...formData.pharms];
 
-        if (searchData.pharms.find(v => v === newValue)) {
+        if (formData.pharms.find(v => v === newValue)) {
             newArr = newArr.filter(v => v != newValue);
         } else {
             newArr.push(newValue);
         }
 
-        setSearchData((prevState) => ({
+        setFormData((prevState) => ({
             ...prevState,
             pharms: newArr,
         }));
@@ -114,32 +115,33 @@ const Search = ({ login, logout }: SearchProps) => {
         let { name, value, min, max } = e.target;
 
         let newValue: string | number = value;
-        if (name === "limit") {
+
+        if (value !== "" && name === "limit") {
             newValue = Math.max(Number(min), Math.min(Number(max), Number(value)));
         }
 
         if (name === "text") {
-            setSelectedSearch(emptyOptionData);
+            setSelectedOption(EMPTY_OPTION_DATA);
         }
 
-        setSearchData({ ...searchData, [name]: newValue })
+        setFormData({ ...formData, [name]: newValue })
     }
 
     const getErrorMessages = () => {
         const messages = [];
-        if (searchData.text.trim().length == 0) {
+        if (formData.text.trim().length == 0) {
             messages.push("The search text can't be empty string!");
         }
 
-        if (searchData.pharms.length == 0) {
+        if (formData.pharms.length == 0) {
             messages.push("You must choose at least 1 pharmacy!");
         }
 
-        if (searchData.limit < 1) {
+        if (formData.limit < 1) {
             messages.push("The limit must be more than 0!");
         }
 
-        if (searchData.limit > 1000) {
+        if (formData.limit > 1000) {
             messages.push("The limit must be less than 1000!");
         }
 
@@ -161,7 +163,7 @@ const Search = ({ login, logout }: SearchProps) => {
 
         setLoading(true);
 
-        const requestParams = { ...searchData, pharms: searchData.pharms.toString() }
+        const requestParams = { ...formData, pharms: formData.pharms.toString() }
 
         request(
             "GET",
@@ -182,18 +184,18 @@ const Search = ({ login, logout }: SearchProps) => {
             "/searches",
             {},
             {
-                searchedText: searchData.text,
-                pharmacies: searchData.pharms,
-                searchLimit: searchData.limit,
+                searchedText: formData.text,
+                pharmacies: formData.pharms,
+                searchLimit: formData.limit,
             }
         ).then(
             (response) => {
 
-                const responseObj: SearchData = response.data;
+                const responseObj: FavoriteSearchData = response.data;
                 const resultItem: OptionData = { "label": responseObj.searchedText, "value": responseObj }
 
                 setOptions(prevState => [...prevState, resultItem]);
-                setSelectedSearch(resultItem);
+                setSelectedOption(resultItem);
 
                 toast.success("Successfully saved search!");
 
@@ -211,9 +213,16 @@ const Search = ({ login, logout }: SearchProps) => {
     }
 
     const handleDropdownChange = (selectedSearch: OptionData | null) => {
-        if (selectedSearch !== null) {
-            setSelectedSearch(selectedSearch);
+        if (selectedSearch === null) {
+            return;
         }
+
+        setFormData({
+            pharms: selectedSearch.value.pharmacies,
+            limit: selectedSearch.value.searchLimit,
+            text: selectedSearch.value.searchedText
+        })
+        setSelectedOption(selectedSearch);
     }
 
 
@@ -230,26 +239,28 @@ const Search = ({ login, logout }: SearchProps) => {
         option: (css) => ({ ...css, width: 500 })
     };
 
+
+
     return (
         <>
             <div className="container d-flex flex-column justify-content-center w-50 mt-5">
 
                 <div className="d-flex flex-column " role="search">
 
-                    <input onChange={onInputChange} value={selectedSearch?.value.searchedText} name="text" className="form-control input-lg mb-3" type="text" placeholder="Search pharmacy item..." aria-label="Search" />
+                    <input onChange={onInputChange} value={formData.text} name="text" className="form-control input-lg mb-3" type="text" placeholder="Search pharmacy item..." aria-label="Search" />
 
 
                     {login && <div className="d-flex flex-row mb-3 gap-2">
 
                         <Select
                             options={options}
-                            value={selectedSearch}
+                            value={selectedOption}
                             onChange={handleDropdownChange}
                             placeholder={"Select saved search..."}
                             styles={styles}
 
                         />
-                        <SaveButton isDisabled={selectedSearch !== null} onClick={saveSearch} />
+                        <SaveButton isDisabled={selectedOption.label.length > 0} onClick={saveSearch} />
                     </div>}
 
                     <div className="align-self-center">
@@ -258,24 +269,24 @@ const Search = ({ login, logout }: SearchProps) => {
 
                             <label >Choose pharmacy:</label>
                             <div className="form-check">
-                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="SOPHARMACY" checked={selectedSearch?.value.pharmacies.includes("SOPHARMACY")} id="sopharmacy" />
+                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="SOPHARMACY" checked={formData.pharms.includes("SOPHARMACY")} id="sopharmacy" />
                                 <label className="form-check-label" htmlFor="sopharmacy">sopharmacy.bg</label>
                             </div>
 
                             <div className="form-check">
-                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="SUBRA" checked={selectedSearch?.value.pharmacies.includes("SUBRA")} id="subra" />
+                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="SUBRA" checked={formData.pharms.includes("SUBRA")} id="subra" />
                                 <label className="form-check-label" htmlFor="subra">subra.bg</label>
                             </div>
 
                             <div className="form-check">
-                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="REMEDIUM" checked={selectedSearch?.value.pharmacies.includes("REMEDIUM")} id="remedium" />
+                                <input onChange={onPharmacyChange} className="form-check-input" type="checkbox" name="pharms" value="REMEDIUM" checked={formData.pharms.includes("REMEDIUM")} id="remedium" />
                                 <label className="form-check-label" htmlFor="remedium">remedium.bg</label>
                             </div>
                         </div>
 
                         <div className="d-flex flex-column align-items-start">
                             <label >Choose limit:</label>
-                            <input onChange={onInputChange} value={selectedSearch?.value.searchLimit} name="limit" className="form-control input-lg mb-3" min="1" max="1000" type="number" placeholder="Limit results for pharmacy..." aria-label="Limit" />
+                            <input onChange={onInputChange} value={formData.limit} name="limit" className="form-control input-lg mb-3" min="1" max="1000" type="number" placeholder="Limit results for pharmacy..." aria-label="Limit" />
                         </div>
 
                         <button onClick={handleSearch} className="btn btn-outline-success" type="button">Search</button>
