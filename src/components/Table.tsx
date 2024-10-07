@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import FilledHeart from "../icons/FilledHeart"
 import OutlinedHeart from "../icons/OutlinedHeart"
-import { Item } from "./Item"
+import { Item } from "../types/Item"
 import { request } from "../helpers/axios_helper"
 import toast from "react-hot-toast"
 

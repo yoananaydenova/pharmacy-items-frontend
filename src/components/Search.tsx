@@ -5,6 +5,7 @@ import { request } from '../helpers/axios_helper.ts';
 import toast from "react-hot-toast";
 import SaveButton from "./SaveButton.tsx";
 import Select from "react-select";
+import { FavoriteSearchData } from "../types/FavoriteSearchData.tsx"
 
 
 type SearchProps = {
@@ -18,11 +19,7 @@ type FormData = {
     pharms: string[],
 }
 
-type FavoriteSearchData = {
-    searchedText: string,
-    searchLimit: number,
-    pharmacies: string[]
-}
+
 
 type OptionData = {
     label: string,

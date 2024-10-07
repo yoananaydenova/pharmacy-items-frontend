@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react"
 import { request, setAuthHeader } from "../helpers/axios_helper";
 import Table from "./Table";
-import { Item } from "./Item";
+import { Item } from "../types/Item";
+import { FavoriteSearchData } from "../types/FavoriteSearchData.tsx"
+import SearchTable from "./SearchTable.tsx";
 
 type DashboardProps = {
     login: boolean,
@@ -12,8 +14,11 @@ const Dashboard = ({ login, logout }: DashboardProps) => {
 
     const [favorites, setFavorites] = useState<Item[]>([])
 
+    const [searches, setSearches] = useState<FavoriteSearchData[]>([])
+
     useEffect(() => {
         loadFavorites();
+        loadSearches();
     }, []);
 
     const loadFavorites = () => {
@@ -41,6 +46,27 @@ const Dashboard = ({ login, logout }: DashboardProps) => {
         setFavorites((favorites) => favorites.filter((favUrl) => favUrl.itemUrl !== itemUrl));
     }
 
+    const loadSearches = () => {
+        request(
+            "GET",
+            "/searches",
+            {},
+            {}
+        ).then(
+            (response) => {
+                setSearches(response.data)
+            }).catch(
+                (error) => {
+                    if (error.response.status === 401) {
+                        setAuthHeader(null);
+                    } else {
+                        setFavorites(error.response.code)
+                    }
+
+                }
+            );
+    }
+
     return (
         <div className="mt-5">
 
@@ -64,7 +90,7 @@ const Dashboard = ({ login, logout }: DashboardProps) => {
                     <div className="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                         <h3 className="card-header bg-light">Favorite Searches</h3>
                         <div className="card-body">
-                            Searches
+                            <SearchTable searches={searches}/>
                         </div>
                     </div>
                     <div className="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
