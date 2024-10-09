@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import FilledHeart from "../icons/FilledHeart"
-import OutlinedHeart from "../icons/OutlinedHeart"
+import FilledHeartIcon from "../icons/FilledHeartIcon"
+import OutlinedHeartIcon from "../icons/OutlinedHeartIcon"
 import { Item } from "../types/Item"
 import { request } from "../helpers/axios_helper"
 import toast from "react-hot-toast"
@@ -167,7 +167,7 @@ const Table = ({ items, removeItem, login, logout }: TableProps) => {
                 <td className="position-relative">
                   <a href={item.itemUrl} rel="noopener noreferrer" target="_blank">{item.itemName}</a>
                   <button onClick={() => addOrRemoveFromFavorites(item)} className="btn btn-light rounded-pill position-absolute bottom-0 start-50 translate-middle">
-                    {isFavorite(item.itemUrl) ? <FilledHeart width="20px" height="20px" /> : <OutlinedHeart width="20px" height="20px" />}
+                    {isFavorite(item.itemUrl) ? <FilledHeartIcon width="20px" height="20px" /> : <OutlinedHeartIcon width="20px" height="20px" />}
                   </button>
 
                 </td>
