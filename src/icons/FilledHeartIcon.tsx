@@ -1,4 +1,4 @@
-const FilledHeart = ({ width, height }: { width: string, height: string }) => {
+const FilledHeartIcon = ({ width, height }: { width: string, height: string }) => {
     return (
         <svg width={width} height={height} version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 512.002 512.002" xmlSpace="preserve" fill="#000000">
             <g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round">
@@ -15,4 +15,4 @@ const FilledHeart = ({ width, height }: { width: string, height: string }) => {
     )
 }
 
-export default FilledHeart
+export default FilledHeartIcon
