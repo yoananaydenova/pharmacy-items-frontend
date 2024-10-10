@@ -1,11 +1,15 @@
+import { request } from "../helpers/axios_helper";
+import DeleteIcon from "../icons/DeleteIcon";
 import { FavoriteSearchData } from "../types/FavoriteSearchData"
 import { v4 as uuidv4 } from "uuid";
+import toast from "react-hot-toast"
 
 type SearchTableProps = {
-    searches: FavoriteSearchData[]
+    searches: FavoriteSearchData[],
+    logout: () => void
 }
 
-const SearchTable = ({ searches }: SearchTableProps) => {
+const SearchTable = ({ searches, logout }: SearchTableProps) => {
 
 
     const getPharmacyNameCss = (pharmacyName: string) => {
@@ -20,9 +24,31 @@ const SearchTable = ({ searches }: SearchTableProps) => {
             default:
                 return "badge bg-white"
         }
+    }
 
+    const removeSearch = (item: FavoriteSearchData) => {
 
+        request(
+            "DELETE",
+            `/searches/${item.id}`,
+            {},
+            {}
+        ).then(
+            (response) => {
 
+                //TODO remove from searches
+               
+                toast.success(response.data)
+            }).catch(
+                (error) => {
+                    if (error.response.status === 401) {
+                        logout();
+                        toast.error("The user was logged out!");
+                    } else {
+                        toast.error(error.response.code);
+                    }
+                }
+            );
     }
 
 
@@ -41,7 +67,7 @@ const SearchTable = ({ searches }: SearchTableProps) => {
                 <tbody className="table-group-divider">
                     {searches.map((item, index) => {
                         return (
-                            <tr key={uuidv4()}>
+                            <tr key={item.id}>
                                 <th scope="row">{index + 1}</th>
                                 <td>
                                     <p>{item.searchedText}</p>
@@ -57,10 +83,13 @@ const SearchTable = ({ searches }: SearchTableProps) => {
                                 </td>
                                 <td className="position-relative">
                                     <p>{item.searchLimit}</p>
-                                    {/* <button onClick={() => addOrRemoveFromFavorites(item)} className="btn btn-light rounded-pill position-absolute bottom-0 start-50 translate-middle">
-                                        {isFavorite(item.itemUrl) ? <FilledHeart width="20px" height="20px" /> : <OutlinedHeart width="20px" height="20px" />}
-                                    </button> */}
 
+                                </td>
+
+                                <td className="position-relative">
+                                    <button onClick={() => removeSearch(item)} className="btn btn-light rounded-pill mb-3">
+                                        <DeleteIcon width="20px" height="20px" />
+                                    </button>
                                 </td>
 
                             </tr>
