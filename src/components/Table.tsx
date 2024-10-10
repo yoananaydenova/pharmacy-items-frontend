@@ -42,7 +42,6 @@ const Table = ({ items, removeItem, login, logout }: TableProps) => {
 
       }).catch(
         (error) => {
-          console.log('error', error)
           if (error.response.status === 401) {
             logout()
             toast.error("The user was logged out!");
@@ -115,7 +114,7 @@ const Table = ({ items, removeItem, login, logout }: TableProps) => {
         (error) => {
           if (error.response.status === 401) {
             logout();
-            toast.error("Тhe user was logged out!");
+            toast.error("The user was logged out!");
           } else {
             toast.error(error.response.code);
           }
