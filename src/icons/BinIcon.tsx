@@ -1,4 +1,6 @@
-const DeleteIcon = ({ width, height }: { width: string, height: string }) => {
+import { Icon } from "../types/Icon"
+
+const BinIcon = ({ width, height }: Icon) => {
     return (
         <svg width={width} height={height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
@@ -8,4 +10,4 @@ const DeleteIcon = ({ width, height }: { width: string, height: string }) => {
     )
 }
 
-export default DeleteIcon
+export default BinIcon
