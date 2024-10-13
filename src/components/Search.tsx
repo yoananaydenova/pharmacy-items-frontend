@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import SaveButton from "./SaveButton.tsx";
 import Select from "react-select";
 import { FavoriteSearchData } from "../types/FavoriteSearchData.tsx"
+import OutlinedHeartIcon from "../icons/OutlinedHeartIcon.tsx";
+import FilledHeartIcon from "../icons/FilledHeartIcon.tsx";
 
 
 type SearchProps = {
@@ -299,6 +301,9 @@ const Search = ({ login, logout }: SearchProps) => {
                         items={items}
                         login={login}
                         logout={logout}
+                        addIcon={<OutlinedHeartIcon width="20px" height="20px" />}
+                        removeIcon={<FilledHeartIcon width="20px" height="20px" />}
+                        
                     />}
             </div>
         </>

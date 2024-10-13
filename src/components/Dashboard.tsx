@@ -4,6 +4,7 @@ import Table from "./Table";
 import { Item } from "../types/Item";
 import { FavoriteSearchData } from "../types/FavoriteSearchData.tsx"
 import SearchTable from "./SearchTable.tsx";
+import BinIcon from "../icons/BinIcon.tsx";
 
 type DashboardProps = {
     login: boolean,
@@ -83,7 +84,14 @@ const Dashboard = ({ login, logout }: DashboardProps) => {
                         <h3 className="card-header bg-light">Favorite Items</h3>
                         <div className="card-body">
                             {favorites.length > 0 ?
-                                <Table items={favorites} login={login} logout={logout} removeItem={removeItem} />
+                                <Table
+                                    items={favorites}
+                                    login={login}
+                                    logout={logout}
+                                    removeItem={removeItem}
+                                    addIcon={null}
+                                    removeIcon={<BinIcon width="20px" height="20px" />}
+                                />
                                 : null}
                         </div>
                     </div>

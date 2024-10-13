@@ -1,5 +1,5 @@
 import { request } from "../helpers/axios_helper";
-import DeleteIcon from "../icons/DeleteIcon";
+import BinIcon from "../icons/BinIcon";
 import { FavoriteSearchData } from "../types/FavoriteSearchData"
 import { v4 as uuidv4 } from "uuid";
 import toast from "react-hot-toast"
@@ -37,7 +37,7 @@ const SearchTable = ({ searches, logout }: SearchTableProps) => {
             (response) => {
 
                 //TODO remove from searches
-               
+
                 toast.success(response.data)
             }).catch(
                 (error) => {
@@ -88,7 +88,7 @@ const SearchTable = ({ searches, logout }: SearchTableProps) => {
 
                                 <td className="position-relative">
                                     <button onClick={() => removeSearch(item)} className="btn btn-light rounded-pill mb-3">
-                                        <DeleteIcon width="20px" height="20px" />
+                                        <BinIcon width="20px" height="20px" />
                                     </button>
                                 </td>
 

@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react"
-import FilledHeartIcon from "../icons/FilledHeartIcon"
-import OutlinedHeartIcon from "../icons/OutlinedHeartIcon"
+import { ReactNode, useEffect, useState } from "react"
 import { Item } from "../types/Item"
 import { request } from "../helpers/axios_helper"
 import toast from "react-hot-toast"
@@ -10,7 +8,9 @@ type TableProps = {
   items: Item[],
   removeItem?: (itemUrl: string) => void,
   login: boolean,
-  logout: () => void
+  logout: () => void,
+  addIcon?: ReactNode,
+  removeIcon: ReactNode
 }
 
 type FavoriteItem = {
@@ -18,7 +18,7 @@ type FavoriteItem = {
   itemUrl: string
 }
 
-const Table = ({ items, removeItem, login, logout }: TableProps) => {
+const Table = ({ items, removeItem, login, logout, addIcon, removeIcon }: TableProps) => {
 
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
 
@@ -63,7 +63,6 @@ const Table = ({ items, removeItem, login, logout }: TableProps) => {
       removeFromFavorites(resultItem[0]);
     } else {
       addToFavorites(item)
-
     }
   }
 
@@ -165,9 +164,12 @@ const Table = ({ items, removeItem, login, logout }: TableProps) => {
                 </td>
                 <td className="position-relative">
                   <a href={item.itemUrl} rel="noopener noreferrer" target="_blank">{item.itemName}</a>
-                  <button onClick={() => addOrRemoveFromFavorites(item)} className="btn btn-light rounded-pill position-absolute bottom-0 start-50 translate-middle">
-                    {isFavorite(item.itemUrl) ? <FilledHeartIcon width="20px" height="20px" /> : <OutlinedHeartIcon width="20px" height="20px" />}
-                  </button>
+
+                  {login && <button onClick={() => addOrRemoveFromFavorites(item)} className="btn btn-light rounded-pill position-absolute bottom-0 start-50 translate-middle">
+                    {isFavorite(item.itemUrl)
+                      ? removeIcon
+                      : addIcon}
+                  </button>}
 
                 </td>
                 <td className={item.price == null ? "text-danger" : "text-dark"}>{item.price == null ? "Изчерпан" : item.price}</td>
