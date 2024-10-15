@@ -98,7 +98,7 @@ const Dashboard = ({ login, logout }: DashboardProps) => {
                     <div className="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                         <h3 className="card-header bg-light">Favorite Searches</h3>
                         <div className="card-body">
-                            <SearchTable searches={searches} logout={logout} />
+                            <SearchTable searches={searches} setSearches={setSearches} logout={logout} />
                         </div>
                     </div>
                     <div className="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">

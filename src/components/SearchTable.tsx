@@ -6,10 +6,11 @@ import toast from "react-hot-toast"
 
 type SearchTableProps = {
     searches: FavoriteSearchData[],
+    setSearches: (res: FavoriteSearchData[]) => void,
     logout: () => void
 }
 
-const SearchTable = ({ searches, logout }: SearchTableProps) => {
+const SearchTable = ({ searches, setSearches, logout }: SearchTableProps) => {
 
 
     const getPharmacyNameCss = (pharmacyName: string) => {
@@ -36,7 +37,8 @@ const SearchTable = ({ searches, logout }: SearchTableProps) => {
         ).then(
             (response) => {
 
-                //TODO remove from searches
+                const result: FavoriteSearchData[] = searches.filter((s) => s.id !== item.id);
+                setSearches(result);
 
                 toast.success(response.data)
             }).catch(
