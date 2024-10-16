@@ -5,6 +5,7 @@ import { Item } from "../types/Item";
 import { FavoriteSearchData } from "../types/FavoriteSearchData.tsx"
 import SearchTable from "./SearchTable.tsx";
 import BinIcon from "../icons/BinIcon.tsx";
+import Profile from "./Profile.tsx";
 
 type DashboardProps = {
     login: boolean,
@@ -102,7 +103,7 @@ const Dashboard = ({ login, logout }: DashboardProps) => {
                         </div>
                     </div>
                     <div className="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
-                        <h3 className="card-header bg-light">Profile Information</h3>
+                        <Profile />
                     </div>
                 </div>
 
