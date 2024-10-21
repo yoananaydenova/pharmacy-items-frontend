@@ -5,12 +5,14 @@ type ProfileData = {
   firstName: string;
   lastName: string;
   login: string;
+  password: string;
 };
 
 const ProfileDataPlaceholder: ProfileData = {
   firstName: "",
   lastName: "",
   login: "",
+  password: "default"
 }
 
 const Profile = () => {
@@ -52,11 +54,6 @@ const Profile = () => {
       <h3 className="card-header bg-light mb-3">Profile Information</h3>
 
       <div className="form-floating mb-3">
-        <input onChange={onInputChange} name="login" value={profileData.login} type="text" className="form-control" id="inputUsername" placeholder="username123" />
-        <label htmlFor="inputUsername">Username</label>
-      </div>
-
-      <div className="form-floating mb-3">
         <input onChange={onInputChange} name="firstName" value={profileData.firstName} type="text" className="form-control" id="inputFirstName" placeholder="John" />
         <label htmlFor="inputFirstName">First name</label>
       </div>
@@ -65,6 +62,18 @@ const Profile = () => {
         <input onChange={onInputChange} name="lastName" value={profileData.lastName} type="text" className="form-control" id="inputLastName" placeholder="Doe" />
         <label htmlFor="inputLastName">Last name</label>
       </div>
+
+      <div className="form-floating mb-3">
+        <input onChange={onInputChange} name="login" value={profileData.login} type="text" className="form-control" id="inputUsername" placeholder="username123" />
+        <label htmlFor="inputUsername">Username</label>
+      </div>
+
+      <div className="form-floating mb-3">
+        <input onChange={onInputChange} name="password" value={profileData.password} type="password" className="form-control" id="inputPassword" placeholder="username123" />
+        <label htmlFor="inputPassword">Password</label>
+      </div>
+
+
 
     </div>
   )
