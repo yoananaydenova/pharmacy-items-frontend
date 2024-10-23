@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { request, setAuthHeader } from "../helpers/axios_helper";
+import toast from "react-hot-toast";
 
 type ProfileData = {
   firstName: string;
@@ -12,10 +13,14 @@ const ProfileDataPlaceholder: ProfileData = {
   firstName: "",
   lastName: "",
   login: "",
-  password: "default"
+  password: "******"
 }
 
-const Profile = () => {
+type ProfileProps = {
+  logout: () => void
+}
+
+const Profile = ({ logout }: ProfileProps) => {
 
   const [profileData, setProfileData] = useState<ProfileData>(ProfileDataPlaceholder);
 
@@ -49,6 +54,33 @@ const Profile = () => {
     setProfileData({ ...profileData, [name]: value })
   }
 
+  const editProfile = () => {
+
+    request(
+      "POST",
+      "/profile",
+      {},
+      profileData
+    ).then(
+      (response) => {
+
+        setAuthHeader(response.data.token);
+        toast.success("The profile was uccessfully edited!");
+
+      }).catch(
+        (error) => {
+
+          if (error.response.status === 401) {
+            console.log('error.response', error.response)
+            logout();
+            toast.error("The user was logged out!");
+          } else {
+            toast.error(error.response.data.message);
+          }
+        }
+      );
+  }
+
   return (
     <div >
       <h3 className="card-header bg-light mb-3">Profile Information</h3>
@@ -73,7 +105,9 @@ const Profile = () => {
         <label htmlFor="inputPassword">Password</label>
       </div>
 
-
+      <button onClick={() => editProfile()} className="btn btn-outline-success py-2 mb-3">
+        Edit
+      </button>
 
     </div>
   )

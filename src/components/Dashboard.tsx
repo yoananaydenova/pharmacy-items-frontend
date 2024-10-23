@@ -103,7 +103,7 @@ const Dashboard = ({ login, logout }: DashboardProps) => {
                         </div>
                     </div>
                     <div className="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
-                        <Profile />
+                        <Profile logout={logout}/>
                     </div>
                 </div>
 
