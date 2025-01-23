@@ -23,7 +23,7 @@ type ProfileProps = {
 const Profile = ({ logout }: ProfileProps) => {
 
   const [profileData, setProfileData] = useState<ProfileData>(ProfileDataPlaceholder);
-
+  const [beforeProfileData, setBeforeProfileData] = useState<ProfileData>(ProfileDataPlaceholder);
   useEffect(() => {
     loadProfile();
   }, []);
@@ -37,6 +37,7 @@ const Profile = ({ logout }: ProfileProps) => {
     ).then(
       (response) => {
         setProfileData(response.data)
+        setBeforeProfileData(response.data)
       }).catch(
         (error) => {
           if (error.response.status === 401) {
@@ -71,11 +72,13 @@ const Profile = ({ logout }: ProfileProps) => {
         (error) => {
 
           if (error.response.status === 401) {
-            console.log('error.response', error.response)
+
             logout();
             toast.error("The user was logged out!");
+
           } else {
             toast.error(error.response.data.message);
+            setProfileData(beforeProfileData);
           }
         }
       );
@@ -105,7 +108,7 @@ const Profile = ({ logout }: ProfileProps) => {
         <label htmlFor="inputPassword">Password</label>
       </div>
 
-      <button onClick={() => editProfile()} className="btn btn-outline-success py-2 mb-3">
+      <button onClick={editProfile} className="btn btn-outline-success py-2 mb-3">
         Edit
       </button>
 
