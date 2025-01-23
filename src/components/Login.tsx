@@ -20,7 +20,7 @@ const Login = ({ onLogin, onRegister }: LoginProps) => {
         onRegister: onRegister
     });
 
-    const onChangeHandler = (event) => {
+    const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         let name = event.target.name;
         let value = event.target.value;
         setFormData((prevStete) => ({ ...prevStete, [name]: value }));
@@ -31,13 +31,13 @@ const Login = ({ onLogin, onRegister }: LoginProps) => {
         setFormData((prevState) => ({ ...prevState, active: formName }))
     }
 
-    const onSubmitLogin = (e) => {
+    const onSubmitLogin = (e : React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         formData.onLogin(formData.login, formData.password);
         navigate("/");
     };
 
-    const onSubmitRegister = (e) => {
+    const onSubmitRegister = (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         formData.onRegister(formData.firstName, formData.lastName, formData.login, formData.password);
         navigate("/");

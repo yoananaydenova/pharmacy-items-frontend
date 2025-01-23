@@ -4,7 +4,8 @@ import Loading from "./Loading";
 import { request } from '../helpers/axios_helper.ts';
 import toast from "react-hot-toast";
 import SaveButton from "./SaveButton.tsx";
-import Select from "react-select";
+import Select, { ActionMeta, SingleValue } from "react-select";
+import { StylesConfig, GroupBase } from 'react-select';
 import { FavoriteSearchData } from "../types/FavoriteSearchData.tsx"
 import OutlinedHeartIcon from "../icons/OutlinedHeartIcon.tsx";
 import FilledHeartIcon from "../icons/FilledHeartIcon.tsx";
@@ -38,7 +39,8 @@ const EMPTY_FORM_DATA = {
 const EMPTY_FAVORITE_SEARCH_DATA = {
     searchedText: "",
     searchLimit: 1,
-    pharmacies: []
+    pharmacies: [],
+    id: 0
 }
 
 const EMPTY_OPTION_DATA: OptionData = {
@@ -211,7 +213,9 @@ const Search = ({ login, logout }: SearchProps) => {
 
     }
 
-    const handleDropdownChange = (selectedSearch: OptionData | null) => {
+    const handleDropdownChange = (
+        selectedSearch: SingleValue<OptionData>, 
+        _actionMeta: ActionMeta<OptionData>) => {
         if (selectedSearch === null) {
             return;
         }
@@ -225,7 +229,7 @@ const Search = ({ login, logout }: SearchProps) => {
     }
 
 
-    const styles = {
+    const styles: StylesConfig<OptionData, false, GroupBase<OptionData>> = {
         control: (css) => ({
             ...css,
             width: 460
@@ -303,7 +307,7 @@ const Search = ({ login, logout }: SearchProps) => {
                         logout={logout}
                         addIcon={<OutlinedHeartIcon width="20px" height="20px" />}
                         removeIcon={<FilledHeartIcon width="20px" height="20px" />}
-                        
+
                     />}
             </div>
         </>

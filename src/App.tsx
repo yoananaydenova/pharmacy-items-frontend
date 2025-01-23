@@ -9,7 +9,8 @@ import { useState } from "react";
 import Dashboard from "./components/Dashboard.tsx";
 import { Toaster } from "react-hot-toast";
 
-function App() {
+
+const App = () =>{
 
   const [login, setLogin] = useState(false);
 
@@ -37,7 +38,7 @@ function App() {
         (response) => {
           handleLogin(response.data.token);
         }).catch(
-          (error) => {
+          () => {
             logout();
           }
         );
@@ -60,7 +61,7 @@ function App() {
         (response) => {
           handleLogin(response.data.token);
         }).catch(
-          (error) => {
+          () => {
             logout();
           }
         );
